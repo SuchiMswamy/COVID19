@@ -1,0 +1,183 @@
+---
+title: "COVID-19 Analysis"
+author: "Sucharita Muthuswamy"
+date: "15 June 2020"
+output: html_document
+---
+PAckages used:
+```{r include=FALSE}
+#install.packages("covid19.analytics")
+
+#install.packages("devtools")
+devtools::install_github("mponce0/covid19.analytics")
+library(covid19.analytics)
+```
+
+To obtain all the records combined for "confirmed", "deaths" and "recovered" cases -- *aggregated* data
+```{r include=FALSE}
+covid19.data.ALLcases <- covid19.data()
+```
+
+To obtain time series data for "confirmed" cases
+```{r include=FALSE}
+covid19.confirmed.cases <- covid19.data("ts-confirmed")
+```
+
+Reads all possible datasets, returning a list
+```{r}
+covid19.all.datasets <- covid19.data("ALL")
+```
+
+Reads the latest aggregated data
+```{r include=FALSE}
+covid19.ALL.agg.cases <- covid19.data("aggregated")
+```
+
+Reads time series data for casualties
+```{r include=FALSE}
+covid19.TS.deaths <- covid19.data("ts-deaths")
+```
+
+To obtain covid19's genomic data
+```{r}
+covid19.gen.seq <- covid19.genomic.data()
+```
+
+To display the actual RNA seq
+```{r}
+covid19.gen.seq$NC_045512.2
+
+report.summary()
+```
+
+Save the tables into a text file named 'covid19-SummaryReport_CURRENTDATE.txt'
+where *CURRRENTDATE* is the actual date
+```{r}
+report.summary(saveReport=TRUE)
+```
+
+Totals for confirmed cases for "Germany"
+```{r}
+tots.per.location(covid19.confirmed.cases,geo.loc="Germany")
+
+tots.per.location(covid19.confirmed.cases,geo.loc="Germany", confBnd=TRUE)
+```
+
+Read the time series data for all the cases
+```{r include=FALSE}
+all.data <- covid19.data('ts-ALL')
+```
+
+Run on all the cases
+```{r}
+tots.per.location(all.data,"Germany")
+```
+
+Total for death cases for "ALL" the regions
+```{r include=FALSE}
+tots.per.location(covid19.TS.deaths)
+
+# or just
+#tots.per.location(covid19.data("ts-confirmed"))
+```
+
+
+
+
+Read time series data for confirmed cases
+```{r include=FALSE}
+TS.data <- covid19.data("ts-confirmed")
+```
+
+Compute changes and growth rates per location for all the countries
+```{r include=FALSE}
+growth.rate(TS.data)
+```
+
+Compute changes and growth rates per location for 'Italy'
+```{r include=FALSE}
+growth.rate(TS.data,geo.loc="Italy")
+```
+
+Compute changes and growth rates per location for 'India' and 'Germany'
+```{r warning=FALSE}
+growth.rate(TS.data,geo.loc=c("India","Germany"))
+```
+
+
+Obtain Time Series data
+```{r include=FALSE}
+TSconfirmed <- covid19.data("ts-confirmed")
+```
+
+Explore different combinations of regions/cities/countries
+When combining different locations, heatmaps will also be generated comparing the trends among these locations
+```{r include=FALSE}
+growth.rate(TSconfirmed,geo.loc=c("Italy", "Germany","Canada","Ontario","Quebec"))
+
+growth.rate(TSconfirmed,geo.loc=c("Hubei","Italy","Spain","United States","Canada","Ontario","Quebec","Germany"))
+
+growth.rate(TSconfirmed,geo.loc=c("Hubei","Italy","Spain","US","Canada","Ontario","Quebec","Germany"))
+```
+
+
+Retrieve time series data
+```{r warning=FALSE, include=FALSE}
+TS.data <- covid19.data("ts-ALL")
+```
+
+Static and interactive plot
+```{r}
+totals.plt(TS.data)
+```
+
+Totals for Germany, without displaying totals and one plot per page
+```{r}
+totals.plt(TS.data, c("Germany"), with.totals=FALSE,one.plt.per.page=TRUE)
+totals.plt(TS.data, c("India"), with.totals=FALSE,one.plt.per.page=TRUE)
+```
+
+Totals for Ontario, Germany, Inida; including global totals with the linear and semi-log plots arranged one next to the other
+```{r}
+totals.plt(TS.data, c("Germany","India"), with.totals=TRUE,one.plt.per.page=FALSE)
+```
+
+Totals for all the locations reported on the dataset, interactive plot will be saved as "totals-all.html"
+```{r}
+totals.plt(TS.data, "ALL", fileName="totals-all")
+# retrieve aggregated data
+data <- covid19.data("aggregated")
+```
+
+Interactive map of aggregated cases -- with more spatial resolution
+```{r}
+live.map(data)
+
+# or
+#live.map()
+```
+
+Interactive map of the time series data of thae confirmed cases with less spatial resolution, ie. aggregated by country
+```{r}
+live.map(covid19.data("ts-confirmed"))
+```
+
+Read time series data for confirmed cases
+```{r include=FALSE}
+data <- covid19.data("ts-confirmed")
+```
+
+Run a SIR model for a given geographical location
+```{r}
+generate.SIR.model(data,"Germany",tot.population=83149300)
+```
+
+Modelling the spread for the whole world, storing the model and generating an interactive visualization
+```{r}
+world.SIR.model <- generate.SIR.model(data,"ALL", t0=1,t1=15, tot.population=7.8e9, staticPlt=FALSE)
+```
+
+Plotting and visualizing the model
+```{r}
+plt.SIR.model(world.SIR.model,"World",interactiveFig=TRUE,fileName="world.SIR.model")
+```
