@@ -4,8 +4,39 @@ author: "Sucharita Muthuswamy"
 date: "15 June 2020"
 output: html_document
 ---
-PAckages used:
-```{r include=FALSE}
+Packages used:
+*1. covid19.analytics: The "covid19.analytics" R package allows users to obtain live worldwide data from the novel CoronaVirus Disease
+*2. devtools
+
+
+**Data Accessibility**
+The covid19.data() function allows users to obtain realtime data about the CoViD19 reported cases from the JHU's CCSE repository, in the following modalities:
+
+1. "aggregated" data for the latest day, with a great 'granularity' of geographical regions (ie. cities, provinces, states, countries)
+
+2. "time series" data for larger accumulated geographical regions (provinces/countries)
+
+3. "deprecated": we also include the original data style in which these datasets were reported initially.
+
+The datasets also include information about the different categories (status) "confirmed"/"deaths"/"recovered" of the cases reported daily per country/region/city.
+
+This data-acquisition function, will first attempt to retrieve the data directly from the JHU repository with the latest updates. If for what ever reason this fails (eg. problems with the connection) the package will load a preserved "image" of the data which is not the latest one but it will still allow the user to explore this older dataset. In this way, the package offers a more robust and resilient approach to the quite dynamical situation with respect to data availability and integrity.
+
+
+|Argument                   | Description                                                   |
+|:-------------------------:|:-------------------------------------------------------------:|
+|aggregated                 | last number of cases by country                               |
+|ts-confirmed               | data of confirmed cases                                       |
+|ts-deaths                  | data of fatal cases                                           |
+|ts-recovered               | time series data of recovered cases                           |
+|ts-ALL                     | all time series data combined                                 |
+|ts-dep-confirmed           | time series data of confirmed cases as originally reported    |
+|ts-dep-deaths              | time series data of deaths as originally reported             |
+|ts-dep-recovered           | time series data of recovered cases as originally reported    |
+|ALL                        | all of the above                                              |
+|Eg: ts-Germany             | time series data of confirmed cases for the city or country   |
+
+```{r echo= TRUE, results= 'hide'}
 #install.packages("covid19.analytics")
 
 #install.packages("devtools")
@@ -14,37 +45,37 @@ library(covid19.analytics)
 ```
 
 To obtain all the records combined for "confirmed", "deaths" and "recovered" cases -- *aggregated* data
-```{r include=FALSE}
+```{r echo=TRUE, message=F, results='hide'}
 covid19.data.ALLcases <- covid19.data()
 ```
 
 To obtain time series data for "confirmed" cases
-```{r include=FALSE}
+```{r echo= TRUE, results= 'hide', message= F}
 covid19.confirmed.cases <- covid19.data("ts-confirmed")
 ```
 
 Reads all possible datasets, returning a list
-```{r}
+```{r echo= TRUE, results= 'hide', message= F}
 covid19.all.datasets <- covid19.data("ALL")
 ```
 
 Reads the latest aggregated data
-```{r include=FALSE}
+```{r echo= TRUE, results= 'hide', message=F}
 covid19.ALL.agg.cases <- covid19.data("aggregated")
 ```
 
 Reads time series data for casualties
-```{r include=FALSE}
+```{r echo= TRUE, results= 'hide', message = F}
 covid19.TS.deaths <- covid19.data("ts-deaths")
 ```
 
 To obtain covid19's genomic data
-```{r}
+```{r echo=TRUE, message=FALSE, warning = F}
 covid19.gen.seq <- covid19.genomic.data()
 ```
 
 To display the actual RNA seq
-```{r}
+```{r echo= TRUE, results= 'hide', warning=F}
 covid19.gen.seq$NC_045512.2
 
 report.summary()
@@ -56,11 +87,11 @@ where *CURRRENTDATE* is the actual date
 report.summary(saveReport=TRUE)
 ```
 
-Totals for confirmed cases for "Germany"
-```{r}
+Totals for confirmed cases for "Germany, India"
+```{r message= FALSE}
 tots.per.location(covid19.confirmed.cases,geo.loc="Germany")
 
-tots.per.location(covid19.confirmed.cases,geo.loc="Germany", confBnd=TRUE)
+tots.per.location(covid19.confirmed.cases,geo.loc="India", confBnd=TRUE)
 ```
 
 Read the time series data for all the cases
@@ -68,7 +99,7 @@ Read the time series data for all the cases
 all.data <- covid19.data('ts-ALL')
 ```
 
-Run on all the cases
+Run on all the cases in Germany
 ```{r}
 tots.per.location(all.data,"Germany")
 ```
@@ -76,9 +107,6 @@ tots.per.location(all.data,"Germany")
 Total for death cases for "ALL" the regions
 ```{r include=FALSE}
 tots.per.location(covid19.TS.deaths)
-
-# or just
-#tots.per.location(covid19.data("ts-confirmed"))
 ```
 
 
@@ -90,13 +118,8 @@ TS.data <- covid19.data("ts-confirmed")
 ```
 
 Compute changes and growth rates per location for all the countries
-```{r include=FALSE}
+```{r include=FALSE, results= F}
 growth.rate(TS.data)
-```
-
-Compute changes and growth rates per location for 'Italy'
-```{r include=FALSE}
-growth.rate(TS.data,geo.loc="Italy")
 ```
 
 Compute changes and growth rates per location for 'India' and 'Germany'
@@ -113,13 +136,8 @@ TSconfirmed <- covid19.data("ts-confirmed")
 Explore different combinations of regions/cities/countries
 When combining different locations, heatmaps will also be generated comparing the trends among these locations
 ```{r include=FALSE}
-growth.rate(TSconfirmed,geo.loc=c("Italy", "Germany","Canada","Ontario","Quebec"))
-
-growth.rate(TSconfirmed,geo.loc=c("Hubei","Italy","Spain","United States","Canada","Ontario","Quebec","Germany"))
-
-growth.rate(TSconfirmed,geo.loc=c("Hubei","Italy","Spain","US","Canada","Ontario","Quebec","Germany"))
+growth.rate(TSconfirmed,geo.loc=c("Italy", "Germany","Canada","Ontario","Tamil Nadu"))
 ```
-
 
 Retrieve time series data
 ```{r warning=FALSE, include=FALSE}
@@ -137,47 +155,44 @@ totals.plt(TS.data, c("Germany"), with.totals=FALSE,one.plt.per.page=TRUE)
 totals.plt(TS.data, c("India"), with.totals=FALSE,one.plt.per.page=TRUE)
 ```
 
-Totals for Ontario, Germany, Inida; including global totals with the linear and semi-log plots arranged one next to the other
+Totals for Germany, India; including global totals with the linear and semi-log plots arranged one next to the other
 ```{r}
 totals.plt(TS.data, c("Germany","India"), with.totals=TRUE,one.plt.per.page=FALSE)
 ```
 
 Totals for all the locations reported on the dataset, interactive plot will be saved as "totals-all.html"
-```{r}
+```{r echo= TRUE, results= 'hide', message = F, warning = F}
 totals.plt(TS.data, "ALL", fileName="totals-all")
 # retrieve aggregated data
 data <- covid19.data("aggregated")
 ```
 
 Interactive map of aggregated cases -- with more spatial resolution
-```{r}
+```{r warning = F, message = F}
 live.map(data)
-
-# or
-#live.map()
 ```
 
 Interactive map of the time series data of thae confirmed cases with less spatial resolution, ie. aggregated by country
-```{r}
+```{r warning = F, message= F}
 live.map(covid19.data("ts-confirmed"))
 ```
 
 Read time series data for confirmed cases
-```{r include=FALSE}
+```{r include=FALSE, warning= F}
 data <- covid19.data("ts-confirmed")
 ```
 
 Run a SIR model for a given geographical location
-```{r}
+```{r warning = F}
 generate.SIR.model(data,"Germany",tot.population=83149300)
 ```
 
 Modelling the spread for the whole world, storing the model and generating an interactive visualization
-```{r}
+```{r warning= F}
 world.SIR.model <- generate.SIR.model(data,"ALL", t0=1,t1=15, tot.population=7.8e9, staticPlt=FALSE)
 ```
 
 Plotting and visualizing the model
-```{r}
+```{r message = F, warning= F}
 plt.SIR.model(world.SIR.model,"World",interactiveFig=TRUE,fileName="world.SIR.model")
 ```
