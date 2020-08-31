@@ -1,4 +1,4 @@
-# script
+# About COVID19 Analysis
 Packages used:
 *1. covid19.analytics: The "covid19.analytics" R package allows users to obtain live worldwide data from the novel CoronaVirus Disease
 *2. devtools
